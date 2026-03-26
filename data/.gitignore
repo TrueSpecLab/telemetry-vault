@@ -1,0 +1,15 @@
+# Ignore Video Production Files
+*.mp4
+*.mov
+*.mkv
+*.prproj
+*.aep
+*.wav
+
+# Ignore OS System Files
+.DS_Store
+Thumbs.db
+
+# Ignore Temporary Excel Files
+~$*.xlsx
+~$*.csv
