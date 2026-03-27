@@ -8,14 +8,14 @@
 > To maintain consistency across diverse tests, we adhere to the following **directory naming convention**:
 > 
 > `ID-[000]-[Short-Name]` (e.g., ID-001-VARTA-Super-Heavy-Duty-AA)
->
-> `REPORT-TYPE` can be any of the following: `ARCHIVE REPORT`, `PRECISION VOLUME`, `RESILIENCE REPORT`, `EFFICIENCY INDEX`
 
+* **📁 ARCHIVE REPORT**: Real measurements, test data, and performance checks to see if the claims actually hold up.
+* **📁 PRECISION VOLUME**: This volume focuses on technical deep-dives into calibration, component-level performance, and high-resolution data analysis.
+* **📁 RESILIENCE REPORT**: These reports document sustained load tests, thermal drift, and worst-case scenarios.
+* **📁 EFFICIENCY INDEX**: We analyze performance-to-waste ratios, thermal-to-performance bottlenecks, and idle power draw.
 
+`REPORT-TYPE` can be any of the following: `ARCHIVE REPORT`, `PRECISION VOLUME`, `RESILIENCE REPORT`, `EFFICIENCY INDEX`
 
-
-
-### `/[PROJECT-TYPE]/ID-[000]-[Short-Name]`
 
 Each experiment or "Lab Report" has its own dedicated folder.
 * **📄 README.md**: Contains the "Metadata of the Test"—Ambient temperature, power source (Battery vs. USB), equipment list (Multimeters/Oscilloscopes used), and specific test conditions.
