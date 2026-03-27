@@ -6,5 +6,6 @@ __pycache__/
 env/
 venv/
 *.json
+*.png
 !requirements.txt
 !README.md
