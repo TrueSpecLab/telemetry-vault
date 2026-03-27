@@ -5,11 +5,15 @@
 ## 📂 Directory Structure
 
 > [!NOTE]
-> To maintain consistency across diverse tests, we adhere to the following **directory naming convention** and **hierarchy**:
+> To maintain consistency across diverse tests, we adhere to the following **directory naming convention**:
 > 
-> `/[REPORT-TYPE]/ID-[000]-[Short-Name]` (e.g., /RESILIENCE-REPORT/001-VARTA-Super-Heavy-Duty-AA)
+> `ID-[000]-[Short-Name]` (e.g., ID-001-VARTA-Super-Heavy-Duty-AA)
 >
 > `REPORT-TYPE` can be any of the following: `ARCHIVE REPORT`, `PRECISION VOLUME`, `RESILIENCE REPORT`, `EFFICIENCY INDEX`
+
+
+
+
 
 ### `/[PROJECT-TYPE]/ID-[000]-[Short-Name]`
 
