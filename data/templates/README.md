@@ -35,4 +35,4 @@ The `raw_logs` and `processed` folders contain the telemetry data. Here is how t
 * `voltage_v`: Measured voltage drop across the component.
 * `current_ma`: Current draw in milliamps.
 * `temp_c`: Surface temperature of the component in Celsius.
-* `state`: The current test phase (e.g., `idle`, `load_active`, `recovery`).
+* `test_state`: The current test phase (e.g., `idle`, `load_active`, `recovery`).
