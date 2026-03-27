@@ -1,10 +1,11 @@
 # 🗄️ TRUESPEC LAB | Research Data Archive
 
-This directory serves as the central repository for all raw telemetry, processed sensor data, and bench configurations generated during TrueSpec Lab research cycles.
+This directory contains the forensic records for every TrueSpec Lab report.
 
 ## 📂 Directory Structure
 
-To maintain consistency across diverse hardware tests (ESP32, Adafruit, SFF Devboards), we adhere to the following hierarchy:
+To maintain consistency across diverse tests, we adhere to the following **directory naming convention** and **hierarchy**:
+`/[PROJECT-TYPE]/ID-[000]-[Short-Name]` (e.g., `/RESILIENCE-REPORT/001-VARTA-Super-Heavy-Duty-AA`)
 
 ### `/[PROJECT-TYPE]/ID-[000]-[Short-Name]`
 
