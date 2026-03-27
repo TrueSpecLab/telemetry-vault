@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import os
 
 # ==========================================
 # PART 1: THE CONFIGURATION & RAW DATA
@@ -217,7 +218,8 @@ def draw_scorecard(results):
                 # Check if this column is a battery score (cols 2,3,4,5)
                 if col >= 2:
                     # Set default to trasparent so I can animate later
-                    cell.set_text_props(color=COLOR_BG) # Start with invisible text
+                    #cell.set_text_props(color=COLOR_BG) # Start with invisible text
+                    cell.set_text_props(color=COLOR_TEXT)
                     
                     val = float(cell_data[row-1][col]) # Get the score value
 
@@ -227,7 +229,7 @@ def draw_scorecard(results):
 
                     if val == max(all_scores):
                         cell.set_facecolor(COLOR_NOTE) # Highlight the cell with gold background
-                        #cell.set_text_props(color='black', weight='bold')
+                        cell.set_text_props(color='black', weight='bold')
                     # RED for failures (< 7.0)
                     elif val < 7.0:
                         cell.set_text_props(color=COLOR_RED, weight='bold')
@@ -261,7 +263,9 @@ def draw_scorecard(results):
     )
 
     plt.tight_layout()
-    plt.savefig('weighted_scorecard.png', dpi=300, facecolor=COLOR_BG) # Save with transparent background
+    plt.savefig(MY_PATH + "\\figures\\ranked_weighted_chart.png", 
+                dpi=300, 
+                facecolor=COLOR_BG) # Save with transparent background
     return fig
 
 # Execute
