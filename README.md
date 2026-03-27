@@ -12,11 +12,8 @@ This repository is the central archive for all raw telemetry, forensic logs, and
 The internet is full of "reviews" that lack data. This vault provides the community with the raw, unedited evidence behind our findings—covering everything from PCB power delivery and thermal efficiency to SFF system acoustics and industrial lighting specs.
 
 ## 📂 Vault Structure
-To find specific data, navigate to the [**/data**](./data) directory. It is organized by project IDs:
-
-* **`raw_logs/`**: Untouched sensor/serial data straight from the bench.
-* **`processed/`**: Cleaned CSVs ready for immediate analysis or graphing.
-* **`schematics/`**: Wiring diagrams and test bench configurations to ensure reproducibility.
+To find specific data, navigate to the [**/data**](./data) directory.
+It is organized based on a Directory Naming Convention for each project.
 
 ---
 
