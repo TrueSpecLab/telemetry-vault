@@ -6,7 +6,8 @@ This directory serves as the central repository for all raw telemetry, processed
 
 To maintain consistency across diverse hardware tests (ESP32, Adafruit, SFF Devboards), we adhere to the following hierarchy:
 
-### `/[(PROJECT TYPE)_ID_000]_[Short-Name]`
+### `/[PROJECT-TYPE]-ID-[000]_[Short-Name]`
+
 Each experiment or "Lab Report" has its own dedicated folder.
 * **📄 README.md**: Contains the "Metadata of the Test"—Ambient temperature, power source (Battery vs. USB), equipment list (Multimeters/Oscilloscopes used), and specific test conditions.
 * **📁 raw_logs**: The "Untouched" output. Serial logs, raw `.txt` or `.csv` files straight from the sensors or data loggers.
