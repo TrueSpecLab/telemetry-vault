@@ -29,6 +29,14 @@ $$Score = 10 - \left( \frac{\text{Voltage Drop}}{0.20V} \times 10 \right)$$
 
 ---
 
+## 📂 Project Structure
+
+- `📁 figures`: Directory with generates graphs.
+- `📁 fonts`: Directory for custom fonts used.
+- `weighted_scorecard.png`: The final exported image of the table.
+
+---
+
 ## 🚀 Setup & Execution
 
 **1. Create & Activate Environment**:
@@ -53,9 +61,3 @@ pip install -r requirements.txt
 ```bash
 python weighted_scorecard.py
 ```
-
----
-
-## 📂 Project Structure
-- `weighted_scorecard.py`: The main  script.
-- `weighted_scorecard.png`: The final exported image of the table.
