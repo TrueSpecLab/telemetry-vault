@@ -4,11 +4,11 @@
 > **Date:** February, 2026
 
 ## 🎯 Primary Objective
-[One sentence explaining what you are testing and why. e.g., "To determine the actual voltage sag of Varta High Energy AA batteries when subjected to a 250mA continuous load at -18°C."]
+To determine the actual voltage sag of Varta High Energy AA batteries when subjected to a 250mA continuous load at -18°C.
 
 ## ⚙️ Hardware Under Test (HUT)
-* **Manufacturer:** [Name]
-* **Model/Component:** [Model Number]
+* **Manufacturer:** VARTA
+* **Model/Component:** Super Heavy Duty AA, Alkaline AA, NiMh AA, Lithium AA
 * **Batch/Serial Number:** [If applicable]
 * **Claimed Spec:** [What the box says]
 
