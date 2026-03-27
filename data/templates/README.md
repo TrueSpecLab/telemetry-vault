@@ -1,4 +1,4 @@
-# 🔬 [PROJECT TYPE] [ID:...]: [Project Title]
+# 🔬 [PROJECT TYPE] [ID:000]: [Project Title]
 
 > **Video Report:** [Link to the YouTube Video]
 > **Status:** `PUBLISHED`
