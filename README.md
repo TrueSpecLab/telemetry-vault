@@ -1,4 +1,4 @@
-# 🗄️ TRUESPEC LAB | TELEMETRY VAULT
+# 🗄️ TRUESPEC LAB | Telemetry Vault
 
 <div align="left">
 <a href="https://github.com/TrueSpecLab">
