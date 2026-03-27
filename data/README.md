@@ -1,11 +1,15 @@
 # 🗄️ TRUESPEC LAB | Research Data Archive
 
-This directory contains the forensic records for every TrueSpec Lab report.
+> This directory contains the forensic records for every TrueSpec Lab report.
 
 ## 📂 Directory Structure
 
-To maintain consistency across diverse tests, we adhere to the following **directory naming convention** and **hierarchy**:
-`/[PROJECT-TYPE]/ID-[000]-[Short-Name]` (e.g., `/RESILIENCE-REPORT/001-VARTA-Super-Heavy-Duty-AA`)
+> [!NOTE]
+> To maintain consistency across diverse tests, we adhere to the following **directory naming convention** and **hierarchy**:
+> 
+> `/[REPORT-TYPE]/ID-[000]-[Short-Name]` (e.g., /RESILIENCE-REPORT/001-VARTA-Super-Heavy-Duty-AA)
+>
+> `REPORT-TYPE` can be any of the following: `ARCHIVE REPORT`, `PRECISION VOLUME`, `RESILIENCE REPORT`, `EFFICIENCY INDEX`
 
 ### `/[PROJECT-TYPE]/ID-[000]-[Short-Name]`
 
