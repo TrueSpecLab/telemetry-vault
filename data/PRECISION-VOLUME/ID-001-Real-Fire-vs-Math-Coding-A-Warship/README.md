@@ -1,4 +1,4 @@
-# 🔬 [PROJECT TYPE] [ID:000]: [Project Title]
+# 🔬 PRECISION VOLUME [ID: 001]: Real Fire vs Math: Coding a Warship
 
 > **Video Report:** [Link to the YouTube Video]
 > **Status:** `PUBLISHED`
