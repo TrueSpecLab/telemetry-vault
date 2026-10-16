@@ -1,3 +1,5 @@
+#include <_Teensy.h>
+
 int ledPin = 13;
 
 void setup()
