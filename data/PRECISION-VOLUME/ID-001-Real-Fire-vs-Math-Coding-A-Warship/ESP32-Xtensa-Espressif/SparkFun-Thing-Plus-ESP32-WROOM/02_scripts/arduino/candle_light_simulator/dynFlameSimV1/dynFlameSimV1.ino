@@ -1,16 +1,16 @@
 // --- PIN DEFINITIONS ---
-const int triggerPin = 33; // Connect a button from this pin to GND
+const int triggerPin = A5; // Connect a button from this pin to GND
 
 // Potentiometer pins (Master Adjustments)
-const uint8_t potIdlePin = 36;      // Adjusts idle flicker intensity
-const uint8_t potChaosPin = 39;     // Adjusts chaotic amplitude
-const uint8_t potHarmonicPin = 34;  // Adjusts the duration/damping of the harmonic ringing
-const uint8_t potBaselinePin = 25;  // Adjusts the overall baseline brightness
+const uint8_t potIdlePin = A0;      // Adjusts idle flicker intensity
+const uint8_t potChaosPin = A1;     // Adjusts chaotic amplitude
+const uint8_t potHarmonicPin = A2;  // Adjusts the duration/damping of the harmonic ringing
+const uint8_t potBaselinePin = A3;  // Adjusts the overall baseline brightness
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
 // Example pinout for 8 LEDs
-const int ledPins[NUM_FLAMES] = {21, 17, 16, 19, 18, 5, 4, 27, 12, 23, 22, 14, 32, 15};
+const int ledPins[NUM_FLAMES] = {12, 27, 33, 15, 32, 14, 22, 23, 21, 17, 16, 19, 18, 5};
 
 const int freq = 5000;
 const int resolution = 12; // 0-4095
@@ -182,12 +182,12 @@ int battleLanternsTriggered = 0;
 const int waveDelayMS = 80; 
 
 void setup() {
-  Serial.begin(115200);
-  while(!Serial);
+  //Serial.begin(115200);
+  //while(!Serial);
 
   pinMode(triggerPin, INPUT);
 
-  randomSeed(analogRead(26)); 
+  randomSeed(analogRead(13)); 
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern

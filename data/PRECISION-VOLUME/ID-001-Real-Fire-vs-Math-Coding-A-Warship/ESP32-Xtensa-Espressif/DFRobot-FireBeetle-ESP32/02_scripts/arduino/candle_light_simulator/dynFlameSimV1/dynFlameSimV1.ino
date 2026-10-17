@@ -9,9 +9,7 @@ const uint8_t potBaselinePin = 35;  // Adjusts the overall baseline brightness
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
-
-// Example pinout for 8 LEDs
-const int ledPins[NUM_FLAMES] = {25, 26, 0, 14, 13, 21, 19, 17, 16, 4, 12, 15, 23, 22};
+const int ledPins[NUM_FLAMES] = {3, 1, 25, 26, 0, 14, 13, 21, 22, 19, 23, 17, 16, 4};
 
 const int freq = 5000;
 const int resolution = 12; // 0-4095
@@ -183,12 +181,11 @@ int battleLanternsTriggered = 0;
 const int waveDelayMS = 80; 
 
 void setup() {
-  Serial.begin(115200);
-  while(!Serial);
+  //Serial.begin(115200);
+  //while(!Serial);
 
   pinMode(triggerPin, INPUT);
-
-  randomSeed(analogRead(36)); 
+  randomSeed(analogRead(12)); 
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
