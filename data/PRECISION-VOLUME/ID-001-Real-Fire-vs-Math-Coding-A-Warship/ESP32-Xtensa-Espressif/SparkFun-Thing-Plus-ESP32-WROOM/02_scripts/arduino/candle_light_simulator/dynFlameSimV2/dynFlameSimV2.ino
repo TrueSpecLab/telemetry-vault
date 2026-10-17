@@ -3,18 +3,18 @@
 // ==============================================================================
 
 // --- PIN DEFINITIONS ---
-const int triggerPin = 33;          // Connect a button from this pin to GND to trigger the "wind wave"
+const int triggerPin = A5;          // Connect a button from this pin to GND to trigger the "wind wave"
 
 // Potentiometer pins (Master Adjustments - Use 3.3V, GND, and the Pin)
-const uint8_t potIdlePin = 36;      // Adjusts how intensely the flame flickers while resting
-const uint8_t potChaosPin = 39;     // Adjusts how violently the flame reacts to a gust of wind
-const uint8_t potHarmonicPin = 34;  // Adjusts how quickly the flame settles back to normal after a gust
-const uint8_t potBaselinePin = 25;  // Adjusts the overall master brightness of the ship
-const uint8_t potSpeedPin = 26;     // Adjusts the Global Tempo (Wind Agitation / Physics Speed)
+const uint8_t potIdlePin = A0;      // Adjusts how intensely the flame flickers while resting
+const uint8_t potChaosPin = A1;     // Adjusts how violently the flame reacts to a gust of wind
+const uint8_t potHarmonicPin = A2;  // Adjusts how quickly the flame settles back to normal after a gust
+const uint8_t potBaselinePin = A3;  // Adjusts the overall master brightness of the ship
+const uint8_t potSpeedPin = A4;     // Adjusts the Global Tempo (Wind Agitation / Physics Speed)
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
-const int ledPins[NUM_FLAMES] = {21, 17, 16, 19, 18, 5, 4, 27, 12, 23, 22, 14, 32, 15};
+const int ledPins[NUM_FLAMES] = {12, 27, 33, 15, 32, 14, 22, 23, 21, 17, 16, 19, 18, 5};
 
 // --- PWM SETTINGS ---
 const int freq = 5000;              // 5kHz frequency prevents visible LED strobing/flicker
@@ -225,7 +225,7 @@ void setup() {
   pinMode(triggerPin, INPUT); // the trigger button
 
   // Seed the random generator by reading environmental noise on an unconnected pin
-  randomSeed(analogRead(36)); 
+  randomSeed(analogRead(13)); 
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
