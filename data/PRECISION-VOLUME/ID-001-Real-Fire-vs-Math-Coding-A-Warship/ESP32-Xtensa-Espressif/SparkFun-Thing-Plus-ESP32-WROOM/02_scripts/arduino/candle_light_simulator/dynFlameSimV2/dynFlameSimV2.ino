@@ -219,8 +219,8 @@ int currentWaveIndex = 0;
 int battleLanternsTriggered = 0;
 
 void setup() {
-  Serial.begin(115200);
-  while(!Serial);
+  //Serial.begin(115200);
+  //while(!Serial);
 
   pinMode(triggerPin, INPUT); // the trigger button
 
