@@ -1,60 +1,24 @@
-// ==============================================================================
-// 17TH CENTURY GALLEON FLAME SYNTHESIZER (SAMD51 DIRECT REGISTER PWM + TC4)
-// ==============================================================================
-
 // --- PIN DEFINITIONS ---
-const int triggerPin = 13;          // Connect a button from this pin to GND
+const int triggerPin = 25; // Connect a button from this pin to GND
 
-// Potentiometer pins (Using analog-capable pins A0 - A3)
-const uint8_t potIdlePin = A0;      
-const uint8_t potChaosPin = A1;     
-const uint8_t potHarmonicPin = A2;  
-const uint8_t potBaselinePin = A3;  
+// Potentiometer pins (Master Adjustments)
+const uint8_t potIdlePin = A0;      // Adjusts idle flicker intensity
+const uint8_t potChaosPin = A1;     // Adjusts chaotic amplitude
+const uint8_t potHarmonicPin = A2;  // Adjusts the duration/damping of the harmonic ringing
+const uint8_t potBaselinePin = A3;  // Adjusts the overall baseline brightness
 
 // --- MULTI-LED SETUP ---
-const int NUM_FLAMES = 8;
-const int ledPins[NUM_FLAMES] = {21, 22, 5, 6, 9, 10, 11, 12};
+const int NUM_FLAMES = 12;
+// Example pinout for 8 LEDs
+const int ledPins[NUM_FLAMES] = {13, 12, 11, 10, 9, 6, 5, 22, 21, 4, 19, 18};
+
+const int freq = 5000;
+const int resolution = 12; // 0-4095
 
 enum FlameState { IDLE, DROP, CHAOTIC, HARMONIC };
 enum Location { STERN, CABIN, BINNACLE, BATTLE, KITCHEN };
 
-// --- NATIVE HARDWARE TIMER SETUP (TC4 at 100Hz) ---
-volatile bool timerFlag = false;
-
-void setupTC4Timer() {
-  GCLK->PCHCTRL[TC4_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
-
-  TC4->COUNT16.CTRLA.bit.ENABLE = 0;
-  while (TC4->COUNT16.SYNCBUSY.bit.ENABLE);
-  TC4->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
-  while (TC4->COUNT16.SYNCBUSY.bit.SWRST);
-
-  TC4->COUNT16.CTRLA.reg = TC_CTRLA_MODE_COUNT16 | TC_CTRLA_PRESCALER_DIV1024;
-  TC4->COUNT16.WAVE.reg = TC_WAVE_WAVEGEN_MFRQ;
-  TC4->COUNT16.CC[0].reg = 469; // 48MHz / 1024 / 100Hz = 100Hz tick
-  while (TC4->COUNT16.SYNCBUSY.bit.CC0);
-
-  TC4->COUNT16.INTENSET.reg = TC_INTENSET_MC0;
-
-  NVIC_DisableIRQ(TC4_IRQn);
-  NVIC_ClearPendingIRQ(TC4_IRQn);
-  NVIC_SetPriority(TC4_IRQn, 0);
-  NVIC_EnableIRQ(TC4_IRQn);
-
-  TC4->COUNT16.CTRLA.bit.ENABLE = 1;
-  while (TC4->COUNT16.SYNCBUSY.bit.ENABLE);
-}
-
-void TC4_Handler() {
-  if (TC4->COUNT16.INTFLAG.reg & TC_INTFLAG_MC0) {
-    TC4->COUNT16.INTFLAG.reg = TC_INTFLAG_MC0;
-    timerFlag = true;
-  }
-}
-
-// ==============================================================================
-// THE FLAME CLASS
-// ==============================================================================
+// --- THE FLAME CLASS ---
 class Flame {
   public:
     int ledPin;
@@ -66,44 +30,78 @@ class Flame {
     float targetIdlePWM;
     unsigned long lastIdleChange = 0;
     
-    int baseBaseline, baseIdleIntensity, baseChaosAmplitude;
+    // Internal base recipe values specific to this location
+    int baseBaseline;
+    int baseIdleIntensity;
+    int baseChaosAmplitude;
     float baseHarmonicDamping;
     
+    // "Personality" variables to make each LED unique
     int brightnessOffset; 
     float flickerSpeedMod;
     float chaosMod;
-    int dropStartPWM = 0;
 
     void init(int pin, Location loc) {
       ledPin = pin;
       locationType = loc;
+      //ledcAttach(ledPin, freq, resolution);
 
       pinMode(ledPin, OUTPUT);
-      analogWrite(ledPin, 0); 
-
+      analogWrite(ledPin, 0);
+      
+      // Generate unique personality for this specific lantern
       brightnessOffset = random(-200, 200); 
-      flickerSpeedMod = random(80, 120) / 100.0; 
-      chaosMod = random(80, 120) / 100.0;         
+      flickerSpeedMod = random(80, 120) / 100.0; // 0.8x to 1.2x speed
+      chaosMod = random(80, 120) / 100.0;        // 0.8x to 1.2x chaos intensity
 
+      // Load the historical recipe based on the location
       switch (locationType) {
-        case STERN:    baseBaseline = 3500; baseIdleIntensity = 800;  baseChaosAmplitude = 1500; baseHarmonicDamping = 0.010; break;
-        case CABIN:    baseBaseline = 3000; baseIdleIntensity = 100;  baseChaosAmplitude = 800;  baseHarmonicDamping = 0.040; break;
-        case BINNACLE: baseBaseline = 1000; baseIdleIntensity = 20;   baseChaosAmplitude = 200;  baseHarmonicDamping = 0.050; break;
-        case BATTLE:   baseBaseline = 2000; baseIdleIntensity = 400;  baseChaosAmplitude = 1000; baseHarmonicDamping = 0.025; break;
-        case KITCHEN:  baseBaseline = 4000; baseIdleIntensity = 1500; baseChaosAmplitude = 2000; baseHarmonicDamping = 0.001; break;
+        case STERN:
+          baseBaseline = 3500;
+          baseIdleIntensity = 800;
+          baseChaosAmplitude = 1500;
+          baseHarmonicDamping = 0.010; // Low damping: bounces around a lot
+          break;
+        case CABIN:
+          baseBaseline = 3000;
+          baseIdleIntensity = 100;
+          baseChaosAmplitude = 800;
+          baseHarmonicDamping = 0.040; // High damping: settles very fast
+          break;
+        case BINNACLE:
+          baseBaseline = 1000;
+          baseIdleIntensity = 20;
+          baseChaosAmplitude = 200;
+          baseHarmonicDamping = 0.050; // Max damping: highly protected, stiff flame
+          break;
+        case BATTLE:
+          baseBaseline = 2000;
+          baseIdleIntensity = 400;
+          baseChaosAmplitude = 1000;
+          baseHarmonicDamping = 0.025; // Medium stats
+          break;
+        case KITCHEN:
+          baseBaseline = 4000;
+          baseIdleIntensity = 1500;
+          baseChaosAmplitude = 2000;
+          baseHarmonicDamping = 0.001; // Minimum damping: chaotic fire that never truly settles
+          break;
       }
+      
       currentIdlePWM = baseBaseline;
       targetIdlePWM = baseBaseline;
     }
 
-    void update(unsigned long currentTime, float bScale, float iScale, float cScale, float hScale) {
-      int myBasePWM = constrain((baseBaseline * bScale) + brightnessOffset, 50, 4095);
-      int myIdleInt = baseIdleIntensity * iScale * chaosMod;
-      int myChaosAmp = baseChaosAmplitude * cScale * chaosMod;
-      float myHarmDamp = baseHarmonicDamping * hScale;
+    void update(unsigned long currentTime, float masterBaselineScale, float masterIdleScale, float masterChaosScale, float masterHarmonicScale) {
       
+      // Calculate this LED's specific values using its base recipe, personality mods, and global master scales
+      int myBasePWM = constrain((baseBaseline * masterBaselineScale) + brightnessOffset, 50, 4095);
+      int myIdleInt = baseIdleIntensity * masterIdleScale * chaosMod;
+      int myChaosAmp = baseChaosAmplitude * masterChaosScale * chaosMod;
+      float myHarmDamp = baseHarmonicDamping * masterHarmonicScale;
+      
+      int outputPWM = myBasePWM; 
       unsigned long timeInState = currentTime - stateStartTime;
-      int outputPWM = myBasePWM;
 
       switch (currentState) {
         case IDLE:
@@ -111,27 +109,25 @@ class Flame {
             targetIdlePWM = myBasePWM + random(-myIdleInt, myIdleInt);
             lastIdleChange = currentTime;
           }
-          currentIdlePWM += (targetIdlePWM - currentIdlePWM) * 0.15;
+          currentIdlePWM += (targetIdlePWM - currentIdlePWM) * 0.2;
           outputPWM = currentIdlePWM;
+
           break;
 
         case DROP:
           if (timeInState < 150) {
-            float t = (float)timeInState / 150.0;
-            int dipTarget = myBasePWM * 0.15; 
-            outputPWM = dropStartPWM + (dipTarget - dropStartPWM) * t;
+            outputPWM = map(timeInState, 0, 150, 100, myBasePWM);
           } else {
             currentState = CHAOTIC;
             stateStartTime = currentTime;
-            currentIdlePWM = outputPWM;
           }
           break;
 
         case CHAOTIC:
           if (timeInState < 600) {
             float envelope = 1.0 - ((float)timeInState / 600.0);
-            outputPWM = myBasePWM + random(-myChaosAmp * envelope, myChaosAmp * envelope);
-            currentIdlePWM = outputPWM;
+            int currentChaos = myChaosAmp * envelope;
+            outputPWM = myBasePWM + random(-currentChaos, currentChaos);
           } else {
             currentState = HARMONIC;
             stateStartTime = currentTime;
@@ -141,12 +137,13 @@ class Flame {
         case HARMONIC:
           if (timeInState < 2000) {
             float timeSec = timeInState / 1000.0;
-            float frequency = 8.0 * flickerSpeedMod; 
+            float frequency = 8.0 * flickerSpeedMod; // 8 * flickerSpeedMod Hz oscillation
+            
+            // Apply the damped sine wave formula
             float oscillation = sin(2 * PI * frequency * timeSec);
             float damping = exp(-myHarmDamp * timeInState); 
             
             outputPWM = myBasePWM + (int)(myChaosAmp * 0.5 * damping * oscillation);
-            currentIdlePWM = outputPWM;
             
             if (damping < 0.05) {
               currentState = IDLE;
@@ -154,105 +151,110 @@ class Flame {
             }
           } else {
             currentState = IDLE;
-            currentIdlePWM = outputPWM;
           }
           break;
       }
 
+      // Constrain to 12-bit bounds before writing
       outputPWM = constrain(outputPWM, 0, 4095);
-      
-      // Gamma correction curve
+
+      // Apply a basic gamma curve for visual realism (squaring)
+      // Normalized 0.0-1.0, squared, then mapped back to 0-4095
       float normalized = outputPWM / 4095.0;
       int gammaPWM = (int)((normalized * normalized) * 4095);
-      
-      // Direct pin update via Arduino's optimized wrapper (bypassing redundant checks)
+
+      //ledcWrite(ledPin, gammaPWM);
       analogWrite(ledPin, gammaPWM);
     }
 
-    void triggerDrop(unsigned long time, int currentPWM) {
-      if (currentState == IDLE) { 
-        currentState = DROP; 
-        stateStartTime = time; 
-        dropStartPWM = currentPWM; 
+    void triggerDrop(unsigned long time) {
+      if (currentState == IDLE) {
+        currentState = DROP;
+        stateStartTime = time;
       }
     }
 };
 
+// Create an array of our Flame objects
 Flame flames[NUM_FLAMES];
+
+// --- WAVE SEQUENCER VARIABLES ---
 bool waveActive = false;
 unsigned long waveStartTime = 0;
 int currentWaveIndex = 0;
 int battleLanternsTriggered = 0;
 const int waveDelayMS = 80; 
 
-unsigned long lastPotReadMillis = 0;
-const unsigned long potReadIntervalMillis = 100; 
-float bScale = 1.0, iScale = 1.0, cScale = 1.0, hScale = 1.0;
-
 void setup() {
-  Serial.begin(115200);
-  
-  analogWriteResolution(12);
-  analogReadResolution(12);
+  //Serial.begin(115200);
+  //while(!Serial);
+
+  analogWriteResolution(resolution);
+  analogReadResolution(resolution);
 
   pinMode(triggerPin, INPUT);
-  randomSeed(analogRead(A5)); 
 
-  flames[0].init(ledPins[0], STERN);     
-  flames[1].init(ledPins[1], CABIN);     
-  flames[2].init(ledPins[2], BINNACLE);  
-  flames[3].init(ledPins[3], KITCHEN);   
-  flames[4].init(ledPins[4], BATTLE);    
-  flames[5].init(ledPins[5], BATTLE);
-  flames[6].init(ledPins[6], BATTLE);
+  randomSeed(analogRead(23)); 
+
+  // Initialize your 14 LEDs and assign them to specific locations on your model
+  flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
+  flames[1].init(ledPins[1], CABIN);     // 1 Great Cabin
+  flames[2].init(ledPins[2], BINNACLE);  // 1 Binnacle
+  flames[3].init(ledPins[3], KITCHEN);   // 1 Galley Fire
+  flames[4].init(ledPins[4], KITCHEN);
+  flames[5].init(ledPins[5], KITCHEN);
+  flames[6].init(ledPins[6], BATTLE);    // 8 Battle Lanterns
   flames[7].init(ledPins[7], BATTLE);
-
-  setupTC4Timer();
+  flames[8].init(ledPins[8], BATTLE);
+  flames[9].init(ledPins[9], BATTLE);
+  flames[10].init(ledPins[10], BATTLE);
+  flames[11].init(ledPins[11], BATTLE);
+  //flames[12].init(ledPins[12], BATTLE);
+  //flames[13].init(ledPins[13], BATTLE);
 }
 
 void loop() {
   unsigned long currentTime = millis();
   
-  if (currentTime - lastPotReadMillis >= potReadIntervalMillis) {
-    lastPotReadMillis = currentTime;
-    
-    int rawBase = analogRead(potBaselinePin);
-    int rawIdle = analogRead(potIdlePin);
-    int rawChaos = analogRead(potChaosPin);
-    int rawHarm = analogRead(potHarmonicPin);
+  // Read potentiometers and map them to a 0.0 to 2.0 multiplier scale (0% to 200%)
+  float masterBaselineScale = map(analogRead(potBaselinePin), 0, 4095, 0, 200) / 100.0;
+  float masterIdleScale =     map(analogRead(potIdlePin),     0, 4095, 0, 200) / 100.0;
+  float masterChaosScale =    map(analogRead(potChaosPin),    0, 4095, 0, 200) / 100.0;
+  float masterHarmonicScale = map(analogRead(potHarmonicPin), 0, 4095, 0, 200) / 100.0; 
 
-    bScale = (rawBase > 50) ? (map(rawBase, 0, 4095, 0, 200) / 100.0) : 1.0;
-    iScale = (rawIdle > 50) ? (map(rawIdle, 0, 4095, 0, 200) / 100.0) : 1.0;
-    cScale = (rawChaos > 50) ? (map(rawChaos, 0, 4095, 0, 200) / 100.0) : 1.0;
-    hScale = (rawHarm > 50) ? (map(rawHarm, 0, 4095, 0, 200) / 100.0) : 1.0;
-  }
-
+  // --- TRIGGER THE WAVE ---
   if (digitalRead(triggerPin) == HIGH && !waveActive) {
-    waveActive = true; 
-    waveStartTime = currentTime; 
-    currentWaveIndex = 0; 
-    battleLanternsTriggered = 0;
+    waveActive = true;
+    waveStartTime = currentTime;
+    currentWaveIndex = 0;
+    battleLanternsTriggered = 0; // Reset our battle-only counter
   }
 
+// --- PROCESS THE WAVE ---
   if (waveActive) {
     if (currentWaveIndex < NUM_FLAMES) {
+      
+      // If this specific light is NOT a battle lantern, skip it instantly
       if (flames[currentWaveIndex].locationType != BATTLE) {
         currentWaveIndex++;
-      } else if (currentTime > waveStartTime + (battleLanternsTriggered * waveDelayMS)) {
-        flames[currentWaveIndex].triggerDrop(currentTime, (int)flames[currentWaveIndex].currentIdlePWM);
+      }
+      // If it IS a battle lantern, wait for the correct wave timing to trigger it
+      else if (currentTime > waveStartTime + (battleLanternsTriggered * waveDelayMS)) {
+        flames[currentWaveIndex].triggerDrop(currentTime);
         currentWaveIndex++;
         battleLanternsTriggered++;
       }
-    } else { 
-      waveActive = false; 
+      
+    } else {
+      // Once we have checked all LEDs in the array, end the wave
+      waveActive = false;
     }
   }
 
-  if (timerFlag) {
-    timerFlag = false; 
-    
-    for (int i = 0; i < NUM_FLAMES; i++) {
-      flames[i].update(currentTime, bScale, iScale, cScale, hScale);
-    }
+  // --- UPDATE ALL FLAMES ---
+  for (int i = 0; i < NUM_FLAMES; i++) {
+    flames[i].update(currentTime, masterBaselineScale, masterIdleScale, masterChaosScale, masterHarmonicScale);
   }
+  
+  delay(10); // Loop pacing
 }

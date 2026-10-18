@@ -1,28 +1,29 @@
 #include <Arduino.h>
 
-int pin = 25;
+// Define your 14 target pins
+const int ledPins[12] = {13, 12, 11, 10, 9, 6, 5, 22, 21, 4, 19, 18};
 
 void setup() {
-  pinMode(pin, OUTPUT);
+  // Initialize all pins as outputs
+  for (int i = 0; i < 12; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
 }
 
 void loop() {
-  // Fade In (Breathing up)
-  for (int i = 0; i <= 255; i++) {
-    float normalized = (float)i / 255.0f;
-    // Apply square-law gamma correction for smooth visual dimming
-    int pwmValue = (int)(255.0f * (normalized * normalized));
-    
-    analogWrite(pin, pwmValue);
-    delay(10);
+  // Example: Fade all 14 channels up simultaneously using hardware PWM
+  for (int brightness = 0; brightness <= 255; brightness++) {
+    for (int i = 0; i < 12; i++) {
+      analogWrite(ledPins[i], brightness);
+    }
+    delay(10); // Adjust speed of fade
   }
 
-  // Fade Out (Breathing down)
-  for (int i = 255; i >= 0; i--) {
-    float normalized = (float)i / 255.0f;
-    int pwmValue = (int)(255.0f * (normalized * normalized));
-    
-    analogWrite(pin, pwmValue);
+  // Fade down
+  for (int brightness = 255; brightness >= 0; brightness--) {
+    for (int i = 0; i < 12; i++) {
+      analogWrite(ledPins[i], brightness);
+    }
     delay(10);
   }
 }
