@@ -1,16 +1,16 @@
 // --- PIN DEFINITIONS ---
-const int triggerPin = 32; // Connect a button from this pin to GND
+const int triggerPin = 22; // Connect a button from this pin to GND
 
 // Potentiometer pins (Master Adjustments)
-const uint8_t potIdlePin = 25;      // Adjusts idle flicker intensity
-const uint8_t potChaosPin = 26;     // Adjusts chaotic amplitude
-const uint8_t potHarmonicPin = 27;  // Adjusts the duration/damping of the harmonic ringing
-const uint8_t potBaselinePin = 33;  // Adjusts the overall baseline brightness
+const uint8_t potIdlePin = A0;      // Adjusts idle flicker intensity
+const uint8_t potChaosPin = A1;     // Adjusts chaotic amplitude
+const uint8_t potHarmonicPin = A2;  // Adjusts the duration/damping of the harmonic ringing
+const uint8_t potBaselinePin = A3;  // Adjusts the overall baseline brightness
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
 // Example pinout for 8 LEDs
-const int ledPins[NUM_FLAMES] = {21, 22, 19, 23, 18, 5, 10, 9, 4, 0, 2, 15, 13, 12};
+const int ledPins[NUM_FLAMES] = {12, 11, 10, 9, 7, 5, 1, 0, 4, 2, 25, 24, 19, 18};
 
 const int freq = 5000;
 const int resolution = 12; // 0-4095
@@ -44,7 +44,10 @@ class Flame {
     void init(int pin, Location loc) {
       ledPin = pin;
       locationType = loc;
-      ledcAttach(ledPin, freq, resolution);
+      //ledcAttach(ledPin, freq, resolution);
+
+      pinMode(ledPin, OUTPUT);
+      analogWrite(ledPin, 0);
       
       // Generate unique personality for this specific lantern
       brightnessOffset = random(-200, 200); 
@@ -160,7 +163,8 @@ class Flame {
       float normalized = outputPWM / 4095.0;
       int gammaPWM = (int)((normalized * normalized) * 4095);
 
-      ledcWrite(ledPin, gammaPWM);
+      //ledcWrite(ledPin, gammaPWM);
+      analogWrite(ledPin, gammaPWM);
     }
 
     void triggerDrop(unsigned long time) {
@@ -182,12 +186,15 @@ int battleLanternsTriggered = 0;
 const int waveDelayMS = 80; 
 
 void setup() {
-  Serial.begin(115200);
-  while(!Serial);
+  //Serial.begin(115200);
+  //while(!Serial);
+
+  analogWriteResolution(resolution);
+  analogReadResolution(resolution);
 
   pinMode(triggerPin, INPUT);
 
-  randomSeed(analogRead(36)); 
+  randomSeed(analogRead(21)); 
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
