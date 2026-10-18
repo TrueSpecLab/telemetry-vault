@@ -3,7 +3,7 @@
 // ==============================================================================
 
 // --- PIN DEFINITIONS ---
-const int triggerPin = 25;          // Connect a button from this pin to GND
+const int triggerPin = 13;          // Connect a button from this pin to GND
 
 // Potentiometer pins (Using analog-capable pins A0 - A3)
 const uint8_t potIdlePin = A0;      
@@ -13,7 +13,7 @@ const uint8_t potBaselinePin = A3;
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 8;
-const int ledPins[NUM_FLAMES] = {4, 5, 6, 9, 10, 11, 12, 13};
+const int ledPins[NUM_FLAMES] = {21, 22, 5, 6, 9, 10, 11, 12};
 
 enum FlameState { IDLE, DROP, CHAOTIC, HARMONIC };
 enum Location { STERN, CABIN, BINNACLE, BATTLE, KITCHEN };
@@ -195,8 +195,8 @@ void setup() {
   analogWriteResolution(12);
   analogReadResolution(12);
 
-  pinMode(triggerPin, INPUT_PULLUP);
-  randomSeed(analogRead(19)); 
+  pinMode(triggerPin, INPUT);
+  randomSeed(analogRead(A5)); 
 
   flames[0].init(ledPins[0], STERN);     
   flames[1].init(ledPins[1], CABIN);     
@@ -227,7 +227,7 @@ void loop() {
     hScale = (rawHarm > 50) ? (map(rawHarm, 0, 4095, 0, 200) / 100.0) : 1.0;
   }
 
-  if (digitalRead(triggerPin) == LOW && !waveActive) {
+  if (digitalRead(triggerPin) == HIGH && !waveActive) {
     waveActive = true; 
     waveStartTime = currentTime; 
     currentWaveIndex = 0; 
