@@ -192,7 +192,7 @@ void setup() {
   analogWriteResolution(resolution);
   analogReadResolution(12);
 
-  pinMode(triggerPin, INPUT_PULLUP);            // Button pulls pin LOW when pressed
+  pinMode(triggerPin, INPUT_PULLUP);     // Button pulls pin HIGH when pressed
   randomSeed(analogRead(17));            // Seed random generator with floating analog pin
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
