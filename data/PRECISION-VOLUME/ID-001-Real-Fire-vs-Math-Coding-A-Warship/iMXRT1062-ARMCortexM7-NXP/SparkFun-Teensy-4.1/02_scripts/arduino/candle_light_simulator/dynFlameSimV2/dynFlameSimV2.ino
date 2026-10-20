@@ -3,18 +3,18 @@
 // ==============================================================================
 
 // --- PIN DEFINITIONS ---
-const int triggerPin = 32;          // Connect a button from this pin to GND to trigger the "wind wave"
+const int triggerPin = 25;          // Connect a button from this pin to GND to trigger the "wind wave"
 
 // Potentiometer pins (Master Adjustments - Use 3.3V, GND, and the Pin)
-const uint8_t potIdlePin = 25;      // Adjusts how intensely the flame flickers while resting
-const uint8_t potChaosPin = 26;     // Adjusts how violently the flame reacts to a gust of wind
-const uint8_t potHarmonicPin = 27;  // Adjusts how quickly the flame settles back to normal after a gust
-const uint8_t potBaselinePin = 33;  // Adjusts the overall master brightness of the ship
-const uint8_t potSpeedPin = 14;     // Adjusts the Global Tempo (Wind Agitation / Physics Speed)
+const uint8_t potIdlePin = 14;      // Adjusts how intensely the flame flickers while resting
+const uint8_t potChaosPin = 15;     // Adjusts how violently the flame reacts to a gust of wind
+const uint8_t potHarmonicPin = 16;  // Adjusts how quickly the flame settles back to normal after a gust
+const uint8_t potBaselinePin = 17;  // Adjusts the overall master brightness of the ship
+const uint8_t potSpeedPin = 18;     // Adjusts the Global Tempo (Wind Agitation / Physics Speed)
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
-const int ledPins[NUM_FLAMES] = {21, 22, 19, 23, 18, 5, 10, 9, 4, 0, 2, 15, 13, 12};
+const int ledPins[NUM_FLAMES] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 24};
 
 // --- PWM SETTINGS ---
 const int freq = 5000;              // 5kHz frequency prevents visible LED strobing/flicker
@@ -32,12 +32,12 @@ class Flame {
     int ledPin;
     FlameState currentState = IDLE;
     Location locationType;
-    unsigned long stateStartTime = 0; // Tracks when the current state began
+    long stateStartTime = 0; // Tracks when the current state began
     
     // Variables to ensure smooth gliding during IDLE flickering
     float currentIdlePWM;
     float targetIdlePWM;
-    unsigned long lastIdleChange = 0;
+    long lastIdleChange = 0;
     
     // Internal base recipe values specific to this historical location
     int baseBaseline, baseIdleIntensity, baseChaosAmplitude;
@@ -53,8 +53,8 @@ class Flame {
       ledPin = pin;
       locationType = loc;
 
-      // Attach the pin to the ESP32 hardware PWM (ESP32 Core v3.x API)
-      ledcAttach(ledPin, freq, resolution);
+      pinMode(ledPin, OUTPUT);
+      analogWriteFrequency(ledPin, freq); // Assign 5kHz hardware FlexPWM frequency
       
       // Generate unique physical traits for this specific lantern
       brightnessOffset = random(-200, 200);       // Slightly dimmer or brighter than its peers
@@ -110,7 +110,7 @@ class Flame {
       int myChaosAmp = baseChaosAmplitude * cScale * chaosMod;
       float myHarmDamp = baseHarmonicDamping * hScale;
       
-      unsigned long timeInState = currentTime - stateStartTime;
+      long timeInState = currentTime - stateStartTime;
       int outputPWM = myBasePWM;
 
       // Adjust state durations based on the Global Speed pot (sScale)
@@ -194,7 +194,10 @@ class Flame {
       // Human eyes perceive brightness logarithmically, not linearly. 
       // Squaring the normalized value maps the math physically correctly to the eye.
       float normalized = outputPWM / 4095.0;
-      ledcWrite(ledPin, (int)((normalized * normalized) * 4095));
+      int gammaPWM = (int)((normalized * normalized) * 4095);
+
+      // Drive the hardware PWM output
+      analogWrite(ledPin, gammaPWM);
     }
 
     // Externally triggers the wind gust effect
@@ -214,18 +217,20 @@ Flame flames[NUM_FLAMES];
 
 // --- WAVE SEQUENCER VARIABLES ---
 bool waveActive = false;
-unsigned long waveStartTime = 0;
+long waveStartTime = 0;
 int currentWaveIndex = 0;
 int battleLanternsTriggered = 0;
 
 void setup() {
-  Serial.begin(115200);
-  while(!Serial);
+  //Serial.begin(115200);
+  //while(!Serial);
 
-  pinMode(triggerPin, INPUT); // the trigger button
+  // Configure Teensy 4.1 PWM and ADC resolution
+  analogWriteResolution(resolution);
+  analogReadResolution(12);
 
-  // Seed the random generator by reading environmental noise on an unconnected pin
-  randomSeed(analogRead(36)); 
+  pinMode(triggerPin, INPUT_PULLUP);     // Button pulls pin HIGH when pressed
+  randomSeed(analogRead(19));            // Seed random generator with floating analog pin  
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
@@ -247,7 +252,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentTime = millis();
+  long currentTime = millis();
   
   // --- READ POTENTIOMETERS ---
   // The Speed pot has a tighter range (0.7x to 1.5x) so it feels like changing the "weather" 
@@ -260,7 +265,7 @@ void loop() {
   float masterChaosScale =    map(analogRead(potChaosPin),    0, 4095, 0, 200) / 100.0;
   float masterHarmonicScale = map(analogRead(potHarmonicPin), 0, 4095, 0, 200) / 100.0;
 
-  Serial.println("masterSpeedScale = " + String(masterSpeedScale));
+  //Serial.println("masterSpeedScale = " + String(masterSpeedScale));
   //Serial.println("masterBaselineScale = " + String(masterBaselineScale));
   //Serial.println("masterIdleScale = " + String(masterIdleScale));
   //Serial.println("masterChaosScale = " + String(masterChaosScale));

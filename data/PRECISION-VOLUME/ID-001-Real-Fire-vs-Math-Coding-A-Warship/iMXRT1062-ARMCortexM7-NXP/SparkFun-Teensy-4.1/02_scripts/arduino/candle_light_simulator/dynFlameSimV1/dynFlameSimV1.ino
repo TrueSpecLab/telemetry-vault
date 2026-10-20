@@ -2,10 +2,10 @@
 const int triggerPin = 25; // Connect a button from this pin to GND
 
 // Potentiometer pins (Master Adjustments)
-const uint8_t potIdlePin = 25;      // Adjusts idle flicker intensity
-const uint8_t potChaosPin = 26;     // Adjusts chaotic amplitude
-const uint8_t potHarmonicPin = 27;  // Adjusts the duration/damping of the harmonic ringing
-const uint8_t potBaselinePin = 33;  // Adjusts the overall baseline brightness
+const uint8_t potIdlePin = 14;      // Adjusts idle flicker intensity
+const uint8_t potChaosPin = 15;     // Adjusts chaotic amplitude
+const uint8_t potHarmonicPin = 16;  // Adjusts the duration/damping of the harmonic ringing
+const uint8_t potBaselinePin = 17;  // Adjusts the overall baseline brightness
 
 // --- MULTI-LED SETUP ---
 const int NUM_FLAMES = 14;
