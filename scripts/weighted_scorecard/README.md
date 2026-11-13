@@ -1,5 +1,5 @@
 
-# 🔋 The TRUESPEC LAB Weighted Scorecard
+# 🔋 TRUESPEC LAB | Weighted Scorecard
 
 A Python-based data visualization tool that calculates and renders a weighted scorecard for battery performance under extreme cold conditions (-18°C). 
 This script takes raw multimeter readings from stress tests, applies a weighted scoring algorithm, and generates a high-resolution, dark-mode scorecard image (`weighted_scorecard.png`) suitable for video overlays or technical reports.
@@ -29,6 +29,14 @@ $$Score = 10 - \left( \frac{\text{Voltage Drop}}{0.20V} \times 10 \right)$$
 
 ---
 
+## 📂 Project Structure
+
+- `📁 figures`: Directory with generated graphs.
+- `📁 fonts`: Directory for custom fonts used.
+- `weighted_scorecard.png`: The final exported image of the table.
+
+---
+
 ## 🚀 Setup & Execution
 
 **1. Create & Activate Environment**:
@@ -53,9 +61,3 @@ pip install -r requirements.txt
 ```bash
 python weighted_scorecard.py
 ```
-
----
-
-## 📂 Project Structure
-- `weighted_scorecard.py`: The main  script.
-- `weighted_scorecard.png`: The final exported image of the table.
