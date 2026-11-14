@@ -225,7 +225,7 @@ void setup() {
   pinMode(triggerPin, INPUT); // the trigger button
 
   // Seed the random generator by reading environmental noise on an unconnected pin
-  randomSeed(analogRead(36)); 
+  randomSeed(analogRead(35)); 
 
   // Initialize your 14 LEDs and assign them to specific locations on your model
   flames[0].init(ledPins[0], STERN);     // 1 Stern Lantern
