@@ -61,7 +61,7 @@ void setup() {
   esp_sleep_enable_ext0_wakeup(WAKEUP_PIN, 0);
 
   // Configure the RTC Timer Wakeup as a fallback
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  //esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
 
   Serial.println("Shutting down main CPU. Entering Deep Sleep...");
   Serial.println("Triggers: Timer (" + String(TIME_TO_SLEEP) + "s) OR Pin " + String(WAKEUP_PIN) + " going LOW.");
